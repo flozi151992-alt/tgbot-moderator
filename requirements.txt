@@ -1,0 +1,11 @@
+# Core dependencies
+aiogram==3.21.0
+asyncpg==0.29.0
+python-dotenv==1.0.1
+
+# Database (for compatibility)
+sqlalchemy[asyncio]==2.0.25
+psycopg2-binary==2.9.9
+
+# Optional (for future migrations)
+alembic==1.13.1

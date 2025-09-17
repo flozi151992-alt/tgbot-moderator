@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: tgbot_moderator
+    restart: unless-stopped
+    environment:
+      # Telegram Bot Configuration
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_ADMIN_ID=${BOT_ADMIN_ID}
+      
+      # Remote Database Configuration
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FILE_PATH=logs/bot.log
+    
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/app/logs
+    
+    command: >
+      sh -c "
+        echo '🤖 Starting Telegram Bot Moderator...' &&
+        echo '📡 Connecting to remote database...' &&
+        echo '🔧 Using aiogram 3.21.0 with SQLAlchemy ORM...' &&
+        python main.py
+      "
+    
+    # Health check - проверяем подключение к базе данных
+    healthcheck:
+      test: ["CMD", "python", "-c", "import asyncio; from app.database.database import init_database; asyncio.run(init_database())"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
